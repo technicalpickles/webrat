@@ -56,18 +56,22 @@ module Webrat
     alias_method :match_selector, :have_selector
 
 
-    # Asserts that the body of the response contains
+    # Asserts that the stringlike object (or the body of the response) contains
     # the supplied selector
-    def assert_have_selector(name, attributes = {}, &block)
+    def assert_have_selector(name, attrbutes_or_stringlike = {}, body = nil, &block)
+      attributes, body = normalize_assert_arguments(attrbutes_or_stringlike, body)
+
       matcher = HaveSelector.new(name, attributes, &block)
-      assert matcher.matches?(response_body), matcher.failure_message
+      assert matcher.matches?(body), matcher.failure_message
     end
 
-    # Asserts that the body of the response
+    # Asserts that the stringlike object (or the body of the response)
     # does not contain the supplied string or regepx
-    def assert_have_no_selector(name, attributes = {}, &block)
+    def assert_have_no_selector(name, attrbutes_or_stringlike = {}, body = nil, &block)
+      attributes, body = normalize_assert_arguments(attrbutes_or_stringlike, body)
+
       matcher = HaveSelector.new(name, attributes, &block)
-      assert !matcher.matches?(response_body), matcher.negative_failure_message
+      assert !matcher.matches?(body), matcher.negative_failure_message
     end
 
   end

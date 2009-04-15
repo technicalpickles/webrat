@@ -133,15 +133,32 @@ module Webrat
     end
     alias_method :match_xpath, :have_xpath
 
-    def assert_have_xpath(expected, options = {}, &block)
+    def assert_have_xpath(expected, options_or_stringlike = {}, stringlike = nil, &block)
+      options, stringlike = normalize_assert_arguments(options_or_stringlike, stringlike)
+
       hs = HaveXpath.new(expected, options, &block)
-      assert hs.matches?(response_body), hs.failure_message
+      assert hs.matches?(stringlike), hs.failure_message
     end
 
-    def assert_have_no_xpath(expected, options = {}, &block)
+    def assert_have_no_xpath(expected, options_or_stringlike = {}, stringlike = nil, &block)
+      options, stringlike = normalize_assert_arguments(options_or_stringlike, stringlike)
+
       hs = HaveXpath.new(expected, options, &block)
-      assert !hs.matches?(response_body), hs.negative_failure_message
+      assert !hs.matches?(stringlike), hs.negative_failure_message
     end
 
+
+    private
+    def normalize_assert_arguments(options_or_stringlike, stringlike)
+      if ! options_or_stringlike.kind_of?(Hash)
+        stringlike = options_or_stringlike
+        options = {}
+      else
+        options = options_or_stringlike
+        stringlike = response_body unless stringlike
+      end
+
+      [options, stringlike]
+    end
   end
 end

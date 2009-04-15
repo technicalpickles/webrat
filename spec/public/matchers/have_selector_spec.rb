@@ -99,7 +99,7 @@ describe "have_selector" do
     end
   end
 
-  describe "Test::Unit assertions" do
+  describe "Test::Unit assertions on default response_body" do
     include Test::Unit::Assertions
 
     before(:each) do
@@ -117,6 +117,32 @@ describe "have_selector" do
           assert_have_selector("p")
         }.should raise_error(Test::Unit::AssertionFailedError)
       end
+
+      it "should pass when body contains selection with attributes" do
+        assert_have_selector("li", :content => "First")
+      end
+
+      it "should construct and call matcher correctly without attributes" do
+        matcher = mock('have_selector', :null_object => true)
+        Webrat::Matchers::HaveSelector.should_receive(:new).with("li", {}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_selector("li")
+      end
+
+      it "should construct and call matcher correctly with attributes" do
+        matcher = mock('have_selector', :null_object => true)
+        Webrat::Matchers::HaveSelector.should_receive(:new).with("li", {:content => "First"}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_selector("li", :content => "First")
+      end
     end
 
     describe "assert_have_not_selector" do
@@ -128,6 +154,93 @@ describe "have_selector" do
         lambda {
           assert_have_no_selector("div")
         }.should raise_error(Test::Unit::AssertionFailedError)
+      end
+
+      it "should construct and call matcher correctly without attributes" do
+        matcher = mock('have_selector', :null_object => true)
+        Webrat::Matchers::HaveSelector.should_receive(:new).with("li", {}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_no_selector("li")
+      end
+
+      it "should construct and call matcher correctly with attributes" do
+        matcher = mock('have_selector', :null_object => true)
+        Webrat::Matchers::HaveSelector.should_receive(:new).with("li", {:content => "First"}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_no_selector("li", :content => "First")
+      end
+    end
+  end
+
+  describe "Test::Unit assertions on stringlike object" do
+    include Test::Unit::Assertions
+
+    before(:each) do
+      should_not_receive(:response_body).and_return @body
+      require 'test/unit'
+    end
+
+    describe "assert_have_selector" do
+      it "should pass when body contains the selection" do
+        assert_have_selector("div", @body)
+      end
+
+      it "should construct and call matcher correctly without attributes" do
+        matcher = mock('have_selector', :null_object => true)
+        Webrat::Matchers::HaveSelector.should_receive(:new).with("li", {}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_selector("li", @body)
+      end
+
+      it "should construct and call matcher correctly with attributes" do
+        matcher = mock('have_selector', :null_object => true)
+        Webrat::Matchers::HaveSelector.should_receive(:new).with("li", {:content => "First"}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_selector("li", {:content => "First"}, @body)
+      end
+    end
+
+    describe "assert_have_not_selector" do
+      it "should pass when the body doesn't contain the selection" do
+        assert_have_no_selector("p", @body)
+      end
+
+      it "should construct and call matcher correctly without attributes" do
+        matcher = mock('have_selector', :null_object => true)
+        Webrat::Matchers::HaveSelector.should_receive(:new).with("li", {}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_no_selector("li", @body)
+      end
+
+      it "should construct and call matcher correctly with attributes" do
+        matcher = mock('have_selector', :null_object => true)
+        Webrat::Matchers::HaveSelector.should_receive(:new).with("li", {:content => "First"}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_no_selector("li", {:content => "First"}, @body)
       end
     end
   end

@@ -88,7 +88,7 @@ describe "have_xpath" do
     }.should raise_error(Spec::Expectations::ExpectationNotMetError)
   end
 
-  describe 'asserts for xpath' do
+  describe 'asserts for xpath on default response_body' do
     include Test::Unit::Assertions
 
     before(:each) do
@@ -101,10 +101,36 @@ describe "have_xpath" do
         assert_have_xpath("//div")
       end
 
+      it "should pass when body contains selection with attributes" do
+        assert_have_selector("li", :content => "First")
+      end
+
       it "should throw an exception when the body doesnt have matching xpath" do
         lambda {
           assert_have_xpath("//p")
         }.should raise_error(Test::Unit::AssertionFailedError)
+      end
+
+      it "should construct and call matcher correctly without attributes" do
+        matcher = mock('have_xpath', :null_object => true)
+        Webrat::Matchers::HaveXpath.should_receive(:new).with("//div", {}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_xpath("//div")
+      end
+
+      it "should construct and call matcher correctly with attributes" do
+        matcher = mock('have_xpath', :null_object => true)
+        Webrat::Matchers::HaveXpath.should_receive(:new).with("//li", {:content => "First"}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_xpath("//li", :content => "First")
       end
     end
 
@@ -118,6 +144,94 @@ describe "have_xpath" do
           assert_have_no_xpath("//div")
         }.should raise_error(Test::Unit::AssertionFailedError)
       end
+
+      it "should construct and call matcher correctly without attributes" do
+        matcher = mock('have_xpath', :null_object => true)
+        Webrat::Matchers::HaveXpath.should_receive(:new).with("//li", {}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_no_xpath("//li")
+      end
+
+      it "should construct and call matcher correctly with attributes" do
+        matcher = mock('have_xpath', :null_object => true)
+        Webrat::Matchers::HaveXpath.should_receive(:new).with("//li", {:content => "First"}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_no_xpath("//li", :content => "First")
+      end
     end
+  end
+
+  describe "Test::Unit assertions on stringlike object" do
+    include Test::Unit::Assertions
+
+    before(:each) do
+      should_not_receive(:response_body).and_return @body
+      require 'test/unit'
+    end
+
+    describe "assert_have_xpath" do
+      it "should pass when body contains the selection" do
+        assert_have_xpath("//div", @body)
+      end
+
+      it "should construct and call matcher correctly without attributes" do
+        matcher = mock('have_xpath', :null_object => true)
+        Webrat::Matchers::HaveXpath.should_receive(:new).with("//div", {}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_xpath("//div", @body)
+      end
+
+      it "should construct and call matcher correctly with attributes" do
+        matcher = mock('have_xpath', :null_object => true)
+        Webrat::Matchers::HaveXpath.should_receive(:new).with("//li", {:content => "First"}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_xpath("//li", {:content => "First"}, @body)
+      end
+    end
+
+    describe "assert_have_no_xpath" do
+      it "should pass when the body doesn't contan the xpath" do
+        assert_have_no_xpath("//p", @body)
+      end
+
+      it "should construct and call matcher correctly without attributes" do
+        matcher = mock('have_xpath', :null_object => true)
+        Webrat::Matchers::HaveXpath.should_receive(:new).with("//li", {}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_no_xpath("//li", @body)
+      end
+
+      it "should construct and call matcher correctly with attributes" do
+        matcher = mock('have_xpath', :null_object => true)
+        Webrat::Matchers::HaveXpath.should_receive(:new).with("//li", {:content => "First"}).and_return(matcher)
+
+        matcher.should_receive(:matches?).with(@body)
+
+        stub!(:assert)
+
+        assert_have_no_xpath("//li", { :content => "First" }, @body)
+      end
+    end
+
   end
 end

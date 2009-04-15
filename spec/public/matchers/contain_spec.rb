@@ -36,7 +36,7 @@ describe "contain" do
     end
   end
 
-  describe "asserts for contains," do
+  describe "asserts for contains on default response_body," do
     include Test::Unit::Assertions
 
     before(:each) do
@@ -85,6 +85,27 @@ describe "contain" do
         lambda {
           assert_not_contain(/hello, world/)
         }.should raise_error(Test::Unit::AssertionFailedError)
+      end
+    end
+  end
+
+  describe "asserts for contains on a specific stringlike object," do
+    include Test::Unit::Assertions
+
+    before(:each) do
+      should_not_receive(:response_body).and_return @body
+      require 'test/unit'
+    end
+
+    describe "assert_contain" do
+      it "should pass when containing the text" do
+        assert_contain("hello, world", @body)
+      end
+    end
+
+    describe "assert_not_contain" do
+      it "should pass when not containing the text" do
+        assert_not_contain("monkeys", @body)
       end
     end
   end

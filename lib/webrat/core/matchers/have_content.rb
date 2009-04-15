@@ -55,18 +55,18 @@ module Webrat
       HasContent.new(content)
     end
 
-    # Asserts that the body of the response contain
+    # Asserts that the stringlike object (or body of the response) contain
     # the supplied string or regexp
-    def assert_contain(content)
+    def assert_contain(content, stringlike = response_body)
       hc = HasContent.new(content)
-      assert hc.matches?(response_body), hc.failure_message
+      assert hc.matches?(stringlike), hc.failure_message
     end
 
-    # Asserts that the body of the response
+    # Asserts that the stringlike object (or body of the response)
     # does not contain the supplied string or regepx
-    def assert_not_contain(content)
+    def assert_not_contain(content, stringlike = response_body)
       hc = HasContent.new(content)
-      assert !hc.matches?(response_body), hc.negative_failure_message
+      assert !hc.matches?(stringlike), hc.negative_failure_message
     end
 
   end
